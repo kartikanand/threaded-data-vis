@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Data Visualization</title>
+
+    <link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Design Challenge 2</h1>
+            <p>A utility to visualize threaded data. Please upload a json file using the
+               file browser below.
+            </p>
+        </div>
+    </div>
+
+    <div class="container mb-4 border-bottom">
+        <div class="row">
+            <div class="col-3">
+                <form id="js-file-form">
+                    <div class="form-group">
+                        <label for="js-json-file">JSON File</label>
+                        <input class="form-control-file"
+                               type="file"
+                               id="js-json-file" name="json-file"
+                               accept=".json" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">go</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <nav class="nav nav-pills nav-fill mb-3">
+            <a class="nav-item nav-link active" data-toggle="tab" href="#topics">Topics</a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#groups">Groups</a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#users">Users</a>
+        </nav>
+
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="topics" role="tabpanel" aria-labelledby="topics-tab">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-3">
+                            <h3>Topic Visualization</h3>
+                            <form id="js-topic-form">
+                                <div class="form-group">
+                                    <label for="js-topic-select">Topic ID</label>
+                                    <select id="js-topic-select" class="form-control"></select>
+
+                                    <label for="js-topic-attr-select">Attribute</label>
+                                    <select id="js-topic-attr-select" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block">go</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-9">
+                            <canvas id="js-topic-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="groups" role="tabpanel" aria-labelledby="groups-tab">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-3">
+                            <h3>Group Visualization</h3>
+
+                            <form id="js-group-form">
+                                <div class="form-group">
+                                    <label for="js-group-select">Group ID</label>
+                                    <select id="js-group-select" class="form-control"></select>
+
+                                    <label for="js-group-attr-select">Attribute</label>
+                                    <select id="js-group-attr-select" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block">go</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-9">
+                            <canvas id="js-group-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-3">
+                            <h3>User Visualization</h3>
+
+                            <form id="js-user-form">
+                                <div class="form-group">
+                                    <label for="js-user-select">User ID</label>
+                                    <select id="js-user-select" class="form-control"></select>
+
+                                    <label for="js-user-attr-select">Attribute</label>
+                                    <select id="js-user-attr-select" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block">go</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-9">
+                            <canvas id="js-user-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script type="text/javascript" src="./handlers.js"></script>
+    <script type="text/javascript" src="./utils.js"></script>
+    <script type="text/javascript" src="./script.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>
