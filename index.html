@@ -47,7 +47,7 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="topics" role="tabpanel" aria-labelledby="topics-tab">
                 <div class="container-fluid">
-                    <div class="row">
+                    <div class="row border-bottom">
                         <div class="col-3">
                             <h3>Topic Visualization</h3>
                             <form id="js-topic-form">
@@ -65,7 +65,22 @@
                         </div>
 
                         <div class="col-9">
-                            <canvas id="js-topic-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <canvas id="js-topic-messages-canvas"></canvas>
+                        </div>
+                        <div class="col-6">
+                            <canvas id="js-topic-likes-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <canvas id="js-topic-textchars-canvas"></canvas>
+                        </div>
+                        <div class="col-6">
+                            <canvas id="js-topic-images-canvas"></canvas>
                         </div>
                     </div>
                 </div>
@@ -92,7 +107,22 @@
                         </div>
 
                         <div class="col-9">
-                            <canvas id="js-group-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <canvas id="js-group-messages-canvas"></canvas>
+                        </div>
+                        <div class="col-6">
+                            <canvas id="js-group-likes-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <canvas id="js-group-textchars-canvas"></canvas>
+                        </div>
+                        <div class="col-6">
+                            <canvas id="js-group-images-canvas"></canvas>
                         </div>
                     </div>
                 </div>
@@ -119,12 +149,26 @@
                         </div>
 
                         <div class="col-9">
-                            <canvas id="js-user-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <canvas id="js-user-messages-canvas"></canvas>
+                        </div>
+                        <div class="col-6">
+                            <canvas id="js-user-likes-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <canvas id="js-user-textchars-canvas"></canvas>
+                        </div>
+                        <div class="col-6">
+                            <canvas id="js-user-images-canvas"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 

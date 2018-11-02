@@ -72,7 +72,7 @@ function createBarChart(ctx, {labels, label, data}) {
     return myChart;
 }
 
-function createAggregateChart(aggregateObj, canvasId, selectId, selectAttrId) {
+function createAggregateChart(aggregateObj, key, label, canvasId, selectId, selectAttrId) {
     const selectInput = document.getElementById(selectId);
     const selectAttrInput = document.getElementById(selectAttrId);
 
@@ -82,10 +82,16 @@ function createAggregateChart(aggregateObj, canvasId, selectId, selectAttrId) {
     // get canvas declared in document body
     const ctx = document.getElementById(canvasId).getContext('2d');
 
+    // get chart labels as keys
+    const labels = Object.keys(aggregateObj[id][attr]);
+
+    // get chart values by iterating over keys
+    const data = labels.map((label) => aggregateObj[id][attr][label][key]);
+
     const discreteData = {
-        labels: Object.keys(aggregateObj[id][attr]),
-        label: '# of Messages',
-        data: Object.values(aggregateObj[id][attr])
+        labels: labels,
+        label: label,
+        data: data
     };
 
     return createBarChart(ctx, discreteData);
@@ -102,7 +108,16 @@ function createAggregateChart(aggregateObj, canvasId, selectId, selectAttrId) {
 //   }
 // }
 function updateTopicObj(topicObj, messageObj) {
-    const {user, topicID, groupID} = messageObj;
+    // extract details from the message object
+    const {user, topicID, groupID, info} = messageObj;
+    const {textchars, images} = info;
+
+    // for some reason json allows likes to be null/false instead of 0
+    // so we make it zero
+    let likes = messageObj.likes;
+    if (!likes) {
+        likes = 0;
+    }
 
     if (!topicObj.hasOwnProperty(topicID)) {
         topicObj[topicID] = {
@@ -113,16 +128,32 @@ function updateTopicObj(topicObj, messageObj) {
 
     const userObj = topicObj[topicID].users;
     if (!userObj.hasOwnProperty(user)) {
-        userObj[user] = 1;
+        userObj[user] = {
+            'messages': 1,
+            'likes': likes,
+            'textchars': textchars,
+            'images': images
+        };
     } else {
-        userObj[user] += 1;
+        userObj[user].messages += 1;
+        userObj[user].likes += likes;
+        userObj[user].textchars += textchars;
+        userObj[user].images += images;
     }
 
     const groupObj = topicObj[topicID].groups;
     if (!groupObj.hasOwnProperty(groupID)) {
-        groupObj[groupID] = 1;
+        groupObj[groupID] = {
+            'messages': 1,
+            'likes': likes,
+            'textchars': textchars,
+            'images': images
+        };
     } else {
-        groupObj[groupID] += 1;
+        groupObj[groupID].messages += 1;
+        groupObj[groupID].likes += likes;
+        groupObj[groupID].textchars += textchars;
+        groupObj[groupID].images += images;
     }
 }
 
@@ -137,7 +168,17 @@ function updateTopicObj(topicObj, messageObj) {
 //   }
 // }
 function updateGroupObj(groupObj, messageObj) {
-    const {user, topicID, groupID} = messageObj;
+    // extract details from the message object
+    const {user, topicID, groupID, info} = messageObj;
+    const {textchars, images} = info;
+
+    // for some reason json allows likes to be null/false instead of 0
+    // so we make it zero
+    let likes = messageObj.likes;
+    if (!likes) {
+        likes = 0;
+    }
+
 
     if (!groupObj.hasOwnProperty(groupID)) {
         groupObj[groupID] = {
@@ -148,16 +189,32 @@ function updateGroupObj(groupObj, messageObj) {
 
     const userObj = groupObj[groupID].users;
     if (!userObj.hasOwnProperty(user)) {
-        userObj[user] = 1;
+        userObj[user] = {
+            'messages': 1,
+            'likes': likes,
+            'textchars': textchars,
+            'images': images
+        };
     } else {
-        userObj[user] += 1;
+        userObj[user].messages += 1;
+        userObj[user].likes += likes;
+        userObj[user].textchars += textchars;
+        userObj[user].images += images;
     }
 
     const topicObj = groupObj[groupID].topics;
     if (!topicObj.hasOwnProperty(topicID)) {
-        topicObj[topicID] = 1;
+        topicObj[topicID] = {
+            'messages': 1,
+            'likes': likes,
+            'textchars': textchars,
+            'images': images
+        };
     } else {
-        topicObj[topicID] += 1;
+        topicObj[topicID].messages += 1;
+        topicObj[topicID].likes += likes;
+        topicObj[topicID].textchars += textchars;
+        topicObj[topicID].images += images;
     }
 }
 
@@ -172,7 +229,17 @@ function updateGroupObj(groupObj, messageObj) {
 //   }
 // }
 function updateUserObj(userObj, messageObj) {
-    const {user, topicID, groupID} = messageObj;
+    // extract details from the message object
+    const {user, topicID, groupID, info} = messageObj;
+    const {textchars, images} = info;
+
+    // for some reason json allows likes to be null/false instead of 0
+    // so we make it zero
+    let likes = messageObj.likes;
+    if (!likes) {
+        likes = 0;
+    }
+
 
     if (!userObj.hasOwnProperty(user)) {
         userObj[user] = {
@@ -183,16 +250,32 @@ function updateUserObj(userObj, messageObj) {
 
     const groupObj = userObj[user].groups;
     if (!groupObj.hasOwnProperty(groupID)) {
-        groupObj[groupID] = 1;
+        groupObj[groupID] = {
+            'messages': 1,
+            'likes': likes,
+            'textchars': textchars,
+            'images': images
+        };
     } else {
-        groupObj[groupID] += 1;
+        groupObj[groupID].messages += 1;
+        groupObj[groupID].likes += likes;
+        groupObj[groupID].textchars += textchars;
+        groupObj[groupID].images += images;
     }
 
     const topicObj = userObj[user].topics;
     if (!topicObj.hasOwnProperty(topicID)) {
-        topicObj[topicID] = 1;
+        topicObj[topicID] = {
+            'messages': 1,
+            'likes': likes,
+            'textchars': textchars,
+            'images': images
+        };
     } else {
-        topicObj[topicID] += 1;
+        topicObj[topicID].messages += 1;
+        topicObj[topicID].likes += likes;
+        topicObj[topicID].textchars += textchars;
+        topicObj[topicID].images += images;
     }
 }
 
