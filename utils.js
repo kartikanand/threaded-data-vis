@@ -114,13 +114,22 @@ function createBarChart(ctx, {labels, label, data}, bgColor) {
 }
 
 function createAggregateChart(
-    aggregateObj,
+    aggregateType,
     key,
     label,
     canvasId,
     selectId,
     selectAttrId,
     bgColor) {
+    let aggregateObj;
+    if (aggregateType == 'topic') {
+        aggregateObj = topicObj;
+    } else if (aggregateType == 'group') {
+        aggregateObj = groupObj;
+    } else if (aggregateType == 'user') {
+        aggregateObj = userObj;
+    }
+
     const selectInput = document.getElementById(selectId);
     const selectAttrInput = document.getElementById(selectAttrId);
 
@@ -130,8 +139,16 @@ function createAggregateChart(
     // get canvas declared in document body
     const ctx = document.getElementById(canvasId).getContext('2d');
 
+    let labels;
     // get chart labels as keys
-    const labels = Object.keys(aggregateObj[id][attr]);
+    try {
+        labels = Object.keys(aggregateObj[id][attr]);
+    } catch(e) {
+        console.log(e);
+        console.log(aggregateObj);
+        console.log(id);
+        console.log(attr);
+    }
 
     // get chart values by iterating over keys
     const data = labels.map((label) => aggregateObj[id][attr][label][key]);
@@ -155,7 +172,7 @@ function createAggregateChart(
 //     }
 //   }
 // }
-function updateTopicObj(topicObj, messageObj) {
+function updateTopicObj(messageObj) {
     // extract details from the message object
     const {user, topicID, groupID, info} = messageObj;
     const {textchars, images} = info;
@@ -215,7 +232,7 @@ function updateTopicObj(topicObj, messageObj) {
 //     }
 //   }
 // }
-function updateGroupObj(groupObj, messageObj) {
+function updateGroupObj(messageObj) {
     // extract details from the message object
     const {user, topicID, groupID, info} = messageObj;
     const {textchars, images} = info;
@@ -276,7 +293,7 @@ function updateGroupObj(groupObj, messageObj) {
 //     }
 //   }
 // }
-function updateUserObj(userObj, messageObj) {
+function updateUserObj(messageObj) {
     // extract details from the message object
     const {user, topicID, groupID, info} = messageObj;
     const {textchars, images} = info;
@@ -329,17 +346,11 @@ function updateUserObj(userObj, messageObj) {
 
 // get user, group, and topic level statistics
 function getAggregateStatistics(messageJson) {
-    let userObj = {};
-    let groupObj = {};
-    let topicObj = {};
-
     messageJson.forEach((messageObj) => {
-        updateUserObj(userObj, messageObj);
-        updateGroupObj(groupObj, messageObj);
-        updateTopicObj(topicObj, messageObj);
+        updateUserObj(messageObj);
+        updateGroupObj(messageObj);
+        updateTopicObj(messageObj);
     });
-
-    return {userObj, groupObj, topicObj};
 }
 
 function addOptionsToSelect(select, options) {

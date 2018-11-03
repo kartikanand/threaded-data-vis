@@ -12,3 +12,4 @@ discussion data which consists of topics, groups, and individual users.
 ### To Do
 
 - Add heat map between Group IDs and Topic IDs
+- Remove aggregate objects as global variables (because of event handlers causing closures around them)

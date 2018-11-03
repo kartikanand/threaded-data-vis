@@ -1,9 +1,92 @@
+let topicObj, groupObj, userObj;
+
+const topicCharts = {
+    'messages': {
+        canvas: 'js-topic-messages-canvas',
+        label: '# of Messages',
+        chartObj: null,
+        bgColor: 'rgba(255, 99, 132, 0.2)'
+    },
+    'likes': {
+        canvas: 'js-topic-likes-canvas',
+        label: '# of Likes',
+        chartObj: null,
+        bgColor: 'rgba(54, 162, 235, 0.2)'
+    },
+    'images': {
+        canvas: 'js-topic-images-canvas',
+        label: '# of Images',
+        chartObj: null,
+        bgColor: 'rgba(255, 206, 86, 0.2)'
+    },
+    'textchars': {
+        canvas: 'js-topic-textchars-canvas',
+        label: '# of text characters',
+        chartObj: null,
+        bgColor: 'rgba(75, 192, 192, 0.2)'
+    }
+};
+
+const groupCharts = {
+    'messages': {
+        canvas: 'js-group-messages-canvas',
+        label: '# of Messages',
+        chartObj: null,
+        bgColor: 'rgba(255, 99, 132, 0.2)'
+    },
+    'likes': {
+        canvas: 'js-group-likes-canvas',
+        label: '# of Likes',
+        chartObj: null,
+        bgColor: 'rgba(54, 162, 235, 0.2)'
+    },
+    'images': {
+        canvas: 'js-group-images-canvas',
+        label: '# of Images',
+        chartObj: null,
+        bgColor: 'rgba(255, 206, 86, 0.2)'
+    },
+    'textchars': {
+        canvas: 'js-group-textchars-canvas',
+        label: '# of text characters',
+        chartObj: null,
+        bgColor: 'rgba(75, 192, 192, 0.2)'
+    }
+};
+
+const userCharts = {
+    'messages': {
+        canvas: 'js-user-messages-canvas',
+        label: '# of Messages',
+        chartObj: null,
+        bgColor: 'rgba(255, 99, 132, 0.2)'
+    },
+    'likes': {
+        canvas: 'js-user-likes-canvas',
+        label: '# of Likes',
+        chartObj: null,
+        bgColor: 'rgba(54, 162, 235, 0.2)'
+    },
+    'images': {
+        canvas: 'js-user-images-canvas',
+        label: '# of Images',
+        chartObj: null,
+        bgColor: 'rgba(255, 206, 86, 0.2)'
+    },
+    'textchars': {
+        canvas: 'js-user-textchars-canvas',
+        label: '# of text characters',
+        chartObj: null,
+        bgColor: 'rgba(75, 192, 192, 0.2)'
+    }
+};
+
 function addGlobalEventHandlers() {
     const fileInput = document.getElementById('js-file-form-submit');
     fileInput.addEventListener('click', (ev) => {
         ev.preventDefault();
 
-        const fileInput = ev.target.getElementById('js-json-file');
+        const fileInput = document.getElementById('js-json-file');
         loadJSON(fileInput).then(loadJsonObj);
     });
 
@@ -26,7 +109,6 @@ function addGlobalEventHandlers() {
     });
 }
 
-
 // reset everything when file form is submitted
 function resetSelect() {
     const selectIds = [
@@ -37,6 +119,39 @@ function resetSelect() {
         'js-user-select',
         'js-user-attr-select'];
 
+    for(let chartKey in topicCharts) {
+            // get chart properties such as canvas id and chart object
+            const chartProp = topicCharts[chartKey];
+
+            // destroy any previous chart
+            if (chartProp.chartObj) {
+                chartProp.chartObj.destroy();
+                chartProp.chartObj = null;
+            }
+    }
+
+    for(let chartKey in groupCharts) {
+            // get chart properties such as canvas id and chart object
+            const chartProp = groupCharts[chartKey];
+
+            // destroy any previous chart
+            if (chartProp.chartObj) {
+                chartProp.chartObj.destroy();
+                chartProp.chartObj = null;
+            }
+    }
+
+    for(let chartKey in userCharts) {
+            // get chart properties such as canvas id and chart object
+            const chartProp = userCharts[chartKey];
+
+            // destroy any previous chart
+            if (chartProp.chartObj) {
+                chartProp.chartObj.destroy();
+                chartProp.chartObj = null;
+            }
+    }
+
     selectIds.forEach((id) => {
         const select = document.getElementById(id);
         const length = select.options.length;
@@ -44,6 +159,10 @@ function resetSelect() {
             select.remove(0);
         }
     });
+
+    topicObj = {};
+    groupObj = {};
+    userObj = {};
 }
 
 // main function responsible for drawing charts
@@ -51,15 +170,15 @@ function loadJsonObj(jsonObj) {
     // reset all select boxes
     resetSelect();
 
-    const {topicObj, groupObj, userObj} = getAggregateStatistics(jsonObj);
+    getAggregateStatistics(jsonObj);
 
-    addTopicSelectHandlers(topicObj);
-    addGroupSelectHandlers(groupObj);
-    addUserSelectHandlers(userObj);
+    addTopicSelectHandlers();
+    addGroupSelectHandlers();
+    addUserSelectHandlers();
 }
 
 // add handlers for form in topic sub-tab
-function addTopicSelectHandlers(topicObj) {
+function addTopicSelectHandlers() {
     // add topic IDs to topic select box
     const topicSelectInput = document.querySelector('#js-topic-select');
     addOptionsToSelect(topicSelectInput, Object.keys(topicObj));
@@ -68,40 +187,13 @@ function addTopicSelectHandlers(topicObj) {
     const topicSelectAttrInput = document.querySelector('#js-topic-attr-select');
     addOptionsToSelect(topicSelectAttrInput, ['users', 'groups']);
 
-    const charts = {
-        'messages': {
-            canvas: 'js-topic-messages-canvas',
-            label: '# of Messages',
-            chartObj: null,
-            bgColor: 'rgba(255, 99, 132, 0.2)'
-        },
-        'likes': {
-            canvas: 'js-topic-likes-canvas',
-            label: '# of Likes',
-            chartObj: null,
-            bgColor: 'rgba(54, 162, 235, 0.2)'
-        },
-        'images': {
-            canvas: 'js-topic-images-canvas',
-            label: '# of Images',
-            chartObj: null,
-            bgColor: 'rgba(255, 206, 86, 0.2)'
-        },
-        'textchars': {
-            canvas: 'js-topic-textchars-canvas',
-            label: '# of text characters',
-            chartObj: null,
-            bgColor: 'rgba(75, 192, 192, 0.2)'
-        }
-    };
-
     const topicSelectForm = document.querySelector('#js-topic-form');
     topicSelectForm.addEventListener('submit', (ev) => {
         ev.preventDefault();
 
-        for(let chartKey in charts) {
+        for(let chartKey in topicCharts) {
             // get chart properties such as canvas id and chart object
-            const chartProp = charts[chartKey];
+            const chartProp = topicCharts[chartKey];
 
             // destroy any previous chart
             if (chartProp.chartObj) {
@@ -110,7 +202,8 @@ function addTopicSelectHandlers(topicObj) {
             }
 
             // handle selections
-            chartProp.chartObj = createAggregateChart(topicObj,
+            chartProp.chartObj = createAggregateChart(
+                'topic',
                 chartKey,
                 chartProp.label,
                 chartProp.canvas,
@@ -123,7 +216,7 @@ function addTopicSelectHandlers(topicObj) {
 }
 
 // add handlers for form in group sub-tab
-function addGroupSelectHandlers(groupObj) {
+function addGroupSelectHandlers() {
     // add group IDs to group select box
     const groupSelectInput = document.querySelector('#js-group-select');
     addOptionsToSelect(groupSelectInput, Object.keys(groupObj));
@@ -132,40 +225,13 @@ function addGroupSelectHandlers(groupObj) {
     const groupSelectAttrInput = document.querySelector('#js-group-attr-select');
     addOptionsToSelect(groupSelectAttrInput, ['users', 'topics']);
 
-    const charts = {
-        'messages': {
-            canvas: 'js-group-messages-canvas',
-            label: '# of Messages',
-            chartObj: null,
-            bgColor: 'rgba(255, 99, 132, 0.2)'
-        },
-        'likes': {
-            canvas: 'js-group-likes-canvas',
-            label: '# of Likes',
-            chartObj: null,
-            bgColor: 'rgba(54, 162, 235, 0.2)'
-        },
-        'images': {
-            canvas: 'js-group-images-canvas',
-            label: '# of Images',
-            chartObj: null,
-            bgColor: 'rgba(255, 206, 86, 0.2)'
-        },
-        'textchars': {
-            canvas: 'js-group-textchars-canvas',
-            label: '# of text characters',
-            chartObj: null,
-            bgColor: 'rgba(75, 192, 192, 0.2)'
-        }
-    };
-
     const groupSelectForm = document.querySelector('#js-group-form');
     groupSelectForm.addEventListener('submit', (ev) => {
         ev.preventDefault();
 
-        for(let chartKey in charts) {
+        for(let chartKey in groupCharts) {
             // get chart properties such as canvas id and chart object
-            const chartProp = charts[chartKey];
+            const chartProp = groupCharts[chartKey];
 
             // destroy any previous chart
             if (chartProp.chartObj) {
@@ -174,7 +240,8 @@ function addGroupSelectHandlers(groupObj) {
             }
 
             // handle selections
-            chartProp.chartObj = createAggregateChart(groupObj,
+            chartProp.chartObj = createAggregateChart(
+                'group',
                 chartKey,
                 chartProp.label,
                 chartProp.canvas,
@@ -187,7 +254,7 @@ function addGroupSelectHandlers(groupObj) {
 }
 
 // add handlers for form in user sub-tab
-function addUserSelectHandlers(userObj) {
+function addUserSelectHandlers() {
     // add user IDs to user select box
     const userSelectInput = document.querySelector('#js-user-select');
     addOptionsToSelect(userSelectInput, Object.keys(userObj));
@@ -196,40 +263,13 @@ function addUserSelectHandlers(userObj) {
     const userSelectAttrInput = document.querySelector('#js-user-attr-select');
     addOptionsToSelect(userSelectAttrInput, ['groups', 'topics']);
 
-    const charts = {
-        'messages': {
-            canvas: 'js-user-messages-canvas',
-            label: '# of Messages',
-            chartObj: null,
-            bgColor: 'rgba(255, 99, 132, 0.2)'
-        },
-        'likes': {
-            canvas: 'js-user-likes-canvas',
-            label: '# of Likes',
-            chartObj: null,
-            bgColor: 'rgba(54, 162, 235, 0.2)'
-        },
-        'images': {
-            canvas: 'js-user-images-canvas',
-            label: '# of Images',
-            chartObj: null,
-            bgColor: 'rgba(255, 206, 86, 0.2)'
-        },
-        'textchars': {
-            canvas: 'js-user-textchars-canvas',
-            label: '# of text characters',
-            chartObj: null,
-            bgColor: 'rgba(75, 192, 192, 0.2)'
-        }
-    };
-
     const userSelectForm = document.querySelector('#js-user-form');
     userSelectForm.addEventListener('submit', (ev) => {
         ev.preventDefault();
 
-        for(let chartKey in charts) {
+        for(let chartKey in userCharts) {
             // get chart properties such as canvas id and chart object
-            const chartProp = charts[chartKey];
+            const chartProp = userCharts[chartKey];
 
             // destroy any previous chart
             if (chartProp.chartObj) {
@@ -238,7 +278,8 @@ function addUserSelectHandlers(userObj) {
             }
 
             // handle selections
-            chartProp.chartObj = createAggregateChart(userObj,
+            chartProp.chartObj = createAggregateChart(
+                'user',
                 chartKey,
                 chartProp.label,
                 chartProp.canvas,
