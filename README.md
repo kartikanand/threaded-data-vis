@@ -3,6 +3,9 @@
 The repository serves to showcase various visualizations to analyze threaded
 discussion data which consists of topics, groups, and individual users.
 
+### Demo
+https://www.kartikanand.com/threaded-data-vis/
+
 ### Visualizations
 
 - User level visualizations
