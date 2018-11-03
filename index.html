@@ -20,17 +20,30 @@
 
     <div class="container mb-4 border-bottom">
         <div class="row">
-            <div class="col-3">
+            <div class="col">
                 <form id="js-file-form">
-                    <div class="form-group">
-                        <label for="js-json-file">JSON File</label>
-                        <input class="form-control-file"
-                               type="file"
-                               id="js-json-file" name="json-file"
-                               accept=".json" />
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="js-json-file">JSON File</label>
+                            <input class="form-control-file"
+                                   type="file"
+                                   id="js-json-file" name="json-file"
+                                   accept=".json" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block">go</button>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <button type="click" id="js-file-form-submit" class="btn btn-primary btn-block" value="go">Go</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <button type="click" id="js-file-sample1" class="btn btn-sm btn-danger btn-block" value="sample1">Load Sample 1</button>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <button type="click" id="js-file-sample2" class="btn btn-sm btn-danger btn-block" value="sample2">Load Sample 2</button>
+                        </div>
+                    </div>
                     </div>
                 </form>
             </div>
@@ -59,7 +72,7 @@
                                     <select id="js-topic-attr-select" class="form-control"></select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-block">go</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Go</button>
                                 </div>
                             </form>
                         </div>
@@ -101,7 +114,7 @@
                                     <select id="js-group-attr-select" class="form-control"></select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-block">go</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Go</button>
                                 </div>
                             </form>
                         </div>
@@ -143,7 +156,7 @@
                                     <select id="js-user-attr-select" class="form-control"></select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-block">go</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Go</button>
                                 </div>
                             </form>
                         </div>

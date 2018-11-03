@@ -1,10 +1,28 @@
 function addGlobalEventHandlers() {
-    const fileInput = document.querySelector('#js-file-form');
-    fileInput.addEventListener('submit', (ev) => {
+    const fileInput = document.getElementById('js-file-form-submit');
+    fileInput.addEventListener('click', (ev) => {
         ev.preventDefault();
 
-        const fileInput = ev.target.querySelector('#js-json-file');
-        loadFileHandler(fileInput);
+        const fileInput = ev.target.getElementById('js-json-file');
+        loadJSON(fileInput).then(loadJsonObj);
+    });
+
+    const sampleDataInput1 = document.getElementById('js-file-sample1');
+    sampleDataInput1.addEventListener('click', (ev) => {
+        ev.preventDefault();
+
+        fetch('example1.json').then((response) => {
+            return response.json();
+        }).then(loadJsonObj);
+    });
+
+    const sampleDataInput2 = document.getElementById('js-file-sample2');
+    sampleDataInput2.addEventListener('click', (ev) => {
+        ev.preventDefault();
+
+        fetch('example2.json').then((response) => {
+            return response.json();
+        }).then(loadJsonObj);
     });
 }
 
@@ -28,19 +46,16 @@ function resetSelect() {
     });
 }
 
-
 // main function responsible for drawing charts
-function loadFileHandler(target) {
+function loadJsonObj(jsonObj) {
     // reset all select boxes
     resetSelect();
 
-    loadJSON(target).then((jsonObj) => {
-        const {topicObj, groupObj, userObj} = getAggregateStatistics(jsonObj);
+    const {topicObj, groupObj, userObj} = getAggregateStatistics(jsonObj);
 
-        addTopicSelectHandlers(topicObj);
-        addGroupSelectHandlers(groupObj);
-        addUserSelectHandlers(userObj);
-    });
+    addTopicSelectHandlers(topicObj);
+    addGroupSelectHandlers(groupObj);
+    addUserSelectHandlers(userObj);
 }
 
 // add handlers for form in topic sub-tab
@@ -57,22 +72,26 @@ function addTopicSelectHandlers(topicObj) {
         'messages': {
             canvas: 'js-topic-messages-canvas',
             label: '# of Messages',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(255, 99, 132, 0.2)'
         },
         'likes': {
             canvas: 'js-topic-likes-canvas',
             label: '# of Likes',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(54, 162, 235, 0.2)'
         },
         'images': {
             canvas: 'js-topic-images-canvas',
             label: '# of Images',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(255, 206, 86, 0.2)'
         },
         'textchars': {
             canvas: 'js-topic-textchars-canvas',
             label: '# of text characters',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(75, 192, 192, 0.2)'
         }
     };
 
@@ -96,7 +115,8 @@ function addTopicSelectHandlers(topicObj) {
                 chartProp.label,
                 chartProp.canvas,
                 'js-topic-select',
-                'js-topic-attr-select'
+                'js-topic-attr-select',
+                chartProp.bgColor
             );
         }
     });
@@ -116,22 +136,26 @@ function addGroupSelectHandlers(groupObj) {
         'messages': {
             canvas: 'js-group-messages-canvas',
             label: '# of Messages',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(255, 99, 132, 0.2)'
         },
         'likes': {
             canvas: 'js-group-likes-canvas',
             label: '# of Likes',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(54, 162, 235, 0.2)'
         },
         'images': {
             canvas: 'js-group-images-canvas',
             label: '# of Images',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(255, 206, 86, 0.2)'
         },
         'textchars': {
             canvas: 'js-group-textchars-canvas',
             label: '# of text characters',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(75, 192, 192, 0.2)'
         }
     };
 
@@ -155,7 +179,8 @@ function addGroupSelectHandlers(groupObj) {
                 chartProp.label,
                 chartProp.canvas,
                 'js-group-select',
-                'js-group-attr-select'
+                'js-group-attr-select',
+                chartProp.bgColor
             );
         }
     });
@@ -175,22 +200,26 @@ function addUserSelectHandlers(userObj) {
         'messages': {
             canvas: 'js-user-messages-canvas',
             label: '# of Messages',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(255, 99, 132, 0.2)'
         },
         'likes': {
             canvas: 'js-user-likes-canvas',
             label: '# of Likes',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(54, 162, 235, 0.2)'
         },
         'images': {
             canvas: 'js-user-images-canvas',
             label: '# of Images',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(255, 206, 86, 0.2)'
         },
         'textchars': {
             canvas: 'js-user-textchars-canvas',
             label: '# of text characters',
-            chartObj: null
+            chartObj: null,
+            bgColor: 'rgba(75, 192, 192, 0.2)'
         }
     };
 
@@ -214,7 +243,8 @@ function addUserSelectHandlers(userObj) {
                 chartProp.label,
                 chartProp.canvas,
                 'js-user-select',
-                'js-user-attr-select'
+                'js-user-attr-select',
+                chartProp.bgColor
             );
         }
     });

@@ -27,9 +27,58 @@ function loadJSON (target) {
     });
 }
 
+// ydata should be of the below form
+// {
+//      label: '',
+//      data: []
+// }
+function createBubbleChart(ctx, data) {
+    const myBubbleChart = new Chart(ctx, {
+        type: 'bubble',
+        labels: ['asd','asd1','zxc','zxc1'],
+        data: {
+            datasets: [{
+                data,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255,99,132,1)',
+                borderWidth: 1
+            }]
+        }
+    });
+
+    return myBubbleChart;
+}
+
+function createTopicGroupBubbleChart(topicObj, groupObj, canvasId) {
+    // get canvas declared in document body
+    const ctx = document.getElementById(canvasId).getContext('2d');
+
+    // data array
+    const data = [];
+
+    const groups = Object.keys(groupObj);
+    const topics = Object.keys(topicObj);
+
+    topics.forEach((topic, topicIndx) => {
+        groups.forEach((group, groupIndx) => {
+            // get group object for this topic
+            const groupObj = topicObj[topic].groups;
+            const messageCount = groupObj[group].messages;
+
+            data.push({
+                x: topicIndx,
+                y: groupIndx,
+                r: messageCount
+            });
+        });
+    });
+
+    return createBubbleChart(ctx, data);
+}
+
 // general function responsible for creating a bar chart from supplied
 // axis and their values
-function createBarChart(ctx, {labels, label, data}) {
+function createBarChart(ctx, {labels, label, data}, bgColor) {
     // create a new chart
     const myChart = new Chart(ctx, {
         type: 'bar',
@@ -38,41 +87,40 @@ function createBarChart(ctx, {labels, label, data}) {
             datasets: [{
                 label,
                 data,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
+                backgroundColor: bgColor,
+                borderColor: bgColor
             }]
         },
         options: {
             scales: {
                 yAxes: [{
+                    gridLines: {
+                        display:false
+                    },
                     ticks: {
                         beginAtZero:true
                     }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display:false
+                    }
                 }]
-            },
-            responsive: true,
+            }
         }
     });
 
     return myChart;
 }
 
-function createAggregateChart(aggregateObj, key, label, canvasId, selectId, selectAttrId) {
+function createAggregateChart(
+    aggregateObj,
+    key,
+    label,
+    canvasId,
+    selectId,
+    selectAttrId,
+    bgColor) {
     const selectInput = document.getElementById(selectId);
     const selectAttrInput = document.getElementById(selectAttrId);
 
@@ -94,7 +142,7 @@ function createAggregateChart(aggregateObj, key, label, canvasId, selectId, sele
         data: data
     };
 
-    return createBarChart(ctx, discreteData);
+    return createBarChart(ctx, discreteData, bgColor);
 }
 
 // schema -> {
