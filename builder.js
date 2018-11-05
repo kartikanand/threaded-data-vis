@@ -115,10 +115,10 @@ function createBubbleChart(canvasId, aggregateType, xSelect, ySelect) {
 
 // general function responsible for creating a bar chart from supplied
 // axis and their values
-function createBarChart(ctx, labels, datasets) {
+function createChart(ctx, chartType, labels, datasets) {
     // create a new chart
     const myChart = new Chart(ctx, {
-        type: 'bar',
+        type: chartType,
         data: {
             labels,
             datasets
@@ -146,6 +146,7 @@ function createBarChart(ctx, labels, datasets) {
 }
 
 function createAggregateChart(
+    chartType,
     aggregateType,
     key,
     label,
@@ -168,10 +169,6 @@ function createAggregateChart(
     const id = selectInput.value;
     const attr = selectAttrInput.value;
 
-    if (id == 'all') {
-        return createBubbleChart('js-topic-heatmap', aggregateType, attr, 'messages');
-    }
-
     // get canvas declared in document body
     const ctx = document.getElementById(canvasId).getContext('2d');
 
@@ -189,5 +186,5 @@ function createAggregateChart(
         borderColor: bgColor
     }];
 
-    return createBarChart(ctx, labels, datasets);
+    return createChart(ctx, chartType, labels, datasets);
 }

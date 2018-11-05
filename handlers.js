@@ -43,6 +43,13 @@ function addTopicSelectHandlers() {
     topicSelectForm.addEventListener('submit', (ev) => {
         ev.preventDefault();
 
+        // get chart type
+        let chartType = 'bar';
+        const chartSelect = document.getElementById('topicLineType');
+        if (chartSelect.checked) {
+            chartType = 'line';
+        }
+
         for(let chartKey in topicCharts) {
             // get chart properties such as canvas id and chart object
             const chartProp = topicCharts[chartKey];
@@ -55,6 +62,7 @@ function addTopicSelectHandlers() {
 
             // handle selections
             chartProp.chartObj = createAggregateChart(
+                chartType,
                 'topic',
                 chartKey,
                 chartProp.label,
@@ -85,6 +93,13 @@ function addGroupSelectHandlers() {
             // get chart properties such as canvas id and chart object
             const chartProp = groupCharts[chartKey];
 
+            // get chart type
+            let chartType = 'bar';
+            const chartSelect = document.getElementById('groupLineType');
+            if (chartSelect.checked) {
+                chartType = 'line';
+            }
+
             // destroy any previous chart
             if (chartProp.chartObj) {
                 chartProp.chartObj.destroy();
@@ -93,6 +108,7 @@ function addGroupSelectHandlers() {
 
             // handle selections
             chartProp.chartObj = createAggregateChart(
+                chartType,
                 'group',
                 chartKey,
                 chartProp.label,
@@ -123,6 +139,13 @@ function addUserSelectHandlers() {
             // get chart properties such as canvas id and chart object
             const chartProp = userCharts[chartKey];
 
+            // get chart type
+            let chartType = 'bar';
+            const chartSelect = document.getElementById('userLineType');
+            if (chartSelect.checked) {
+                chartType = 'line';
+            }
+
             // destroy any previous chart
             if (chartProp.chartObj) {
                 chartProp.chartObj.destroy();
@@ -131,6 +154,7 @@ function addUserSelectHandlers() {
 
             // handle selections
             chartProp.chartObj = createAggregateChart(
+                chartType,
                 'user',
                 chartKey,
                 chartProp.label,
