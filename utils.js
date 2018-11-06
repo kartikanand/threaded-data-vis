@@ -37,6 +37,8 @@ function loadJsonObj(jsonObj) {
     addTopicSelectHandlers();
     addGroupSelectHandlers();
     addUserSelectHandlers();
+
+    createHeatMap();
 }
 
 function addOptionsToSelect(select, options) {

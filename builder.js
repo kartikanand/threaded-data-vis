@@ -1,116 +1,117 @@
-// ydata should be of the below form
-// {
-//      label: '',
-//      data: []
-// }
-function createBubbleChart(canvasId, aggregateType, xSelect, ySelect) {
-    // get canvas declared in document body
-    const ctx = document.getElementById(canvasId).getContext('2d');
+const chartColors = {
+    0: '#fee5d9',
+    1: '#fcae91',
+    2: '#fb6a4a',
+    3: '#de2d26',
+    4: '#a50f15',
+};
 
-    let aggregateObj = null;
-    let xKeys = [];
-    let yKeys = [];
-
-    if (aggregateType == 'topic') {
-        aggregateObj = topicObj;
-        xKeys = Object.keys(topicObj);
-    } else if (aggregateType == 'group') {
-        aggregateObj = groupObj;
-        xKeys = Object.keys(groupObj);
-    } else if (aggregateType == 'user') {
-        aggregateObj = userObj;
-        xKeys = Object.keys(userObj);
+function getColor(messages, msgCount) {
+    if (msgCount == 0) {
+        return chartColors[0];
     }
 
-    if (xSelect == 'users') {
-        yKeys = Object.keys(userObj);
-    } else if (xSelect == 'groups') {
-        yKeys = Object.keys(groupObj);
-    } else if (xSelect == 'topics') {
-        yKeys = Object.keys(topicObj)
+    const q25 = Quartile_25(messages);
+    const q50 = Quartile_50(messages);
+    const q75 = Quartile_75(messages);
+
+    if (msgCount <= q25) {
+        return chartColors[1];
     }
 
-    // data array
-    const data = [];
+    if (msgCount <= q50) {
+        return chartColors[2];
+    }
 
-    xKeys.forEach((x, xIndx) => {
-        yKeys.forEach((y, yIndx) => {
+    if (msgCount <= q75) {
+        return chartColors[3];
+    }
+
+    return chartColors[4];
+}
+
+function createHeatMap() {
+    // no. of users --- labels as no. of data
+    let users = Object.keys(userObj);
+
+    // no. of topics --- no. of datasets
+    let topics = Object.keys(topicObj);
+
+    // preprocess to get min/max messages
+    const messages = [];
+    topics.forEach((topic) => {
+        users.forEach((user) => {
             // get y object for this x
-            const yObj = aggregateObj[x][xSelect];
-            const yCount = yObj[y][ySelect];
+            const userObj = topicObj[topic].users;
+            const msgCount = userObj[user].messages;
 
-            data.push({
-                x: xIndx + 1,
-                y: yIndx + 1,
-                value: yCount
-            });
+            messages.push(msgCount);
         });
     });
 
-    const myBubbleChart = new Chart(ctx, {
-        type: 'bubble',
-        data: {
-            datasets: [{
-                data,
-                label: 'No. of messages',
-                backgroundColor: 'rgba(0, 0, 0)',
-                borderColor: 'rgba(0, 0, 0)',
-                borderWidth: 0
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    gridLines: {
-                        display:false
-                    },
-                    ticks: {
-                        beginAtZero:true,
-                        stepSize: 1,
-                        max: yKeys.length + 1,
-                        callback: (value, index, values) => {
-                            if (index == 0 || index == yKeys.length + 1) {
-                                return '';
-                            } else {
-                                return yKeys[index - 1];
-                            }
-                        }
-                    }
-                }],
-                xAxes: [{
-                    gridLines: {
-                        display:false
-                    },
-                    ticks: {
-                        beginAtZero:true,
-                        stepSize: 1,
-                        max: xKeys.length + 1,
-                        callback: (value, index, values) => {
-                            if (index == 0 || index == xKeys.length + 1) {
-                                return '';
-                            } else {
-                                return xKeys[index - 1];
-                            }
-                        }
-                    },
-                }]
-            },
-            elements: {
-                point: {
-                    radius: function(context) {
-                        var index = context.dataIndex;
-                        var data = context.dataset.data[index];
-                        var size = context.chart.width;
-                        var base = data.value / 500;
-                        console.log((size / 24) * base);
-                        return (size / 24) * base;
-                    }
-                }
-            }
-        }
+    const data = Array(users.length).fill(1);
+    const datasets = [];
+    topics.forEach((topic) => {
+        const colors = [];
+        users.forEach((user) => {
+            // get y object for this x
+            const userObj = topicObj[topic].users;
+            const msgCount = userObj[user].messages;
+
+            colors.push(getColor(messages, msgCount));
+        });
+
+        datasets.push({
+            label: topic,
+            backgroundColor: colors,
+            borderColor: 'rgb(130,34,34,0.3)',
+            borderWidth: 0.5,
+            data: data,
+        });
     });
 
-    return myBubbleChart;
+    var barChartData = {
+        labels: users,
+        datasets: datasets
+    };
+
+    const ctx = document.getElementById('heatmap').getContext('2d');
+    var heatmap = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: {
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            responsive: true,
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    barPercentage: 1.0,
+                    categoryPercentage: 1.0,
+                    gridLines: {
+                        display: false
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    barPercentage: 1.0,
+                    categoryPercentage: 1.0,
+                    gridLines: {
+                        display: false
+                    },
+                    ticks: {
+                        beginAtZero:true,
+                        stepSize: 1,
+                        callback: function(label, index, labels) {
+                            return topics[index];
+                        }
+                    }
+                }]
+            }
+        },
+    });
 }
 
 // general function responsible for creating a bar chart from supplied
