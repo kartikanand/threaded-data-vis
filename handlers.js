@@ -1,168 +1,181 @@
 // global objects
 let topicObj = {}, groupObj = {}, userObj = {};
 
-function addGlobalEventHandlers() {
-    const fileInput = document.getElementById('js-file-form-submit');
-    fileInput.addEventListener('click', (ev) => {
-        ev.preventDefault();
+function masterFormHandler(ev) {
+    ev.preventDefault();
 
-        const fileInput = document.getElementById('js-json-file');
-        loadJSON(fileInput).then(loadJsonObj);
-    });
+    // clear and remove any chart present
+    clearChartArea();
 
-    const sampleDataInput1 = document.getElementById('js-file-sample1');
-    sampleDataInput1.addEventListener('click', (ev) => {
-        ev.preventDefault();
+    const row = document.getElementById('js-master-select-row').value;
+    const col = document.getElementById('js-master-select-col').value;
+    const id = document.getElementById('js-master-select-id').value;
+    const attr = document.getElementById('js-master-select-attr').value;
 
-        fetch('example1.json').then((response) => {
-            return response.json();
-        }).then(loadJsonObj);
-    });
+    if (id == 'all') {
+        // create single heatmap canvas
+        createHeatMapCanvas();
+        createHeatMap('js-heatmap', row, col, attr);
+        return;
+    }
 
-    const sampleDataInput2 = document.getElementById('js-file-sample2');
-    sampleDataInput2.addEventListener('click', (ev) => {
-        ev.preventDefault();
+    if (attr != 'all') {
+        // create single barchart canvas
+        createBarChartCanvas();
+        createBarChart('js-barchart', row, col, id, attr, charts[attr].bgColor);
+        return;
+    }
 
-        fetch('example2.json').then((response) => {
-            return response.json();
-        }).then(loadJsonObj);
+    // create multi-barchart canvas
+    createMultiBarChartCanvas();
+    for (let attr in charts) {
+        createBarChart(charts[attr].canvas, row, col, id, attr, charts[attr].bgColor);
+    }
+}
+
+function addFormHandlers() {
+    const form = document.getElementById('js-master-form');
+    form.addEventListener('submit', masterFormHandler);
+
+    const col = document.getElementById('js-master-select-col');
+    col.addEventListener('change', selectColHandler);
+
+    const id = document.getElementById('js-master-select-id');
+    id.addEventListener('change', selectIdHandler);
+}
+
+function resetFormHandlers() {
+    const form = document.getElementById('js-master-form');
+    form.removeEventListener('submit', masterFormHandler);
+
+    const col = document.getElementById('js-master-select-col');
+    col.removeEventListener('change', selectColHandler);
+
+    const id = document.getElementById('js-master-select-id');
+    id.removeEventListener('change', selectIdHandler);
+}
+
+function addSelectOptions() {
+    const row = document.getElementById('js-master-select-row');
+    const col = document.getElementById('js-master-select-col');
+    const id = document.getElementById('js-master-select-id');
+    const attr = document.getElementById('js-master-select-attr');
+
+    resetSelect(row);
+    resetSelect(col);
+    resetSelect(id);
+    resetSelect(attr);
+
+    addOptionsToSelect(row, ['users', 'topics', 'groups']);
+    addOptionsToSelect(col, ['topics', 'groups', 'users']);
+    addOptionsToSelect(attr, ['messages', 'images', 'likes', 'textchars']);
+
+    addSelectIdOptions('topics', id);
+}
+
+function selectColHandler(ev) {
+    ev.preventDefault();
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    const colType = ev.target.value;
+    const select = document.getElementById('js-master-select-id');
+    addSelectIdOptions(colType, select);
+}
+
+function selectIdHandler(ev) {
+    ev.preventDefault();
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    const id = ev.target.value;
+    const select = document.getElementById('js-master-select-attr');
+
+    // remove all existing options
+    resetSelect(select);
+
+    let keys = ['messages', 'images', 'likes', 'textchars'];
+    if (id != 'all') {
+        keys.push('all');
+    }
+
+    addOptionsToSelect(select, keys);
+}
+
+function addSelectIdOptions(colType, select) {
+    // remove all existing options
+    resetSelect(select);
+
+    // get aggregate object according to column type
+    // to populate keys
+    const aggregateObj = getObjectFromStr(colType);
+
+    const keys = Object.keys(aggregateObj);
+
+    // add relevant options
+    addOptionsToSelect(select, ['all']);
+    addOptionsToSelect(select, keys);
+}
+
+function addOptionsToSelect(select, options) {
+    options.forEach((option) => {
+        const selectOption = document.createElement("option");
+        selectOption.value = option;
+        selectOption.text = option;
+
+        select.add(selectOption, null);
     });
 }
 
-// add handlers for form in topic sub-tab
-function addTopicSelectHandlers() {
-    // add topic IDs to topic select box
-    const topicSelectInput = document.querySelector('#js-topic-select');
-    addOptionsToSelect(topicSelectInput, Object.keys(topicObj));
-
-    // add users and groups option to further select
-    const topicSelectAttrInput = document.querySelector('#js-topic-attr-select');
-    addOptionsToSelect(topicSelectAttrInput, ['users', 'groups']);
-
-    const topicSelectForm = document.querySelector('#js-topic-form');
-    topicSelectForm.addEventListener('submit', (ev) => {
-        ev.preventDefault();
-
-        // get chart type
-        let chartType = 'bar';
-        const chartSelect = document.getElementById('topicLineType');
-        if (chartSelect.checked) {
-            chartType = 'line';
-        }
-
-        for(let chartKey in topicCharts) {
-            // get chart properties such as canvas id and chart object
-            const chartProp = topicCharts[chartKey];
-
-            // destroy any previous chart
-            if (chartProp.chartObj) {
-                chartProp.chartObj.destroy();
-                chartProp.chartObj = null;
-            }
-
-            // handle selections
-            chartProp.chartObj = createAggregateChart(
-                chartType,
-                'topic',
-                chartKey,
-                chartProp.label,
-                chartProp.canvas,
-                'js-topic-select',
-                'js-topic-attr-select',
-                chartProp.bgColor
-            );
-        }
-    });
+function clearChartArea() {
+    $('#js-chart-area').empty();
 }
 
-// add handlers for form in group sub-tab
-function addGroupSelectHandlers() {
-    // add group IDs to group select box
-    const groupSelectInput = document.querySelector('#js-group-select');
-    addOptionsToSelect(groupSelectInput, Object.keys(groupObj));
+function getObjectFromStr(str) {
+    let aggregateObj;
+    if (str == 'topics') {
+        aggregateObj = topicObj;
+    } else if (str == 'groups') {
+        aggregateObj = groupObj;
+    } else if (str == 'users') {
+        aggregateObj = userObj;
+    }
 
-    // add users and groups option to further select
-    const groupSelectAttrInput = document.querySelector('#js-group-attr-select');
-    addOptionsToSelect(groupSelectAttrInput, ['users', 'topics']);
-
-    const groupSelectForm = document.querySelector('#js-group-form');
-    groupSelectForm.addEventListener('submit', (ev) => {
-        ev.preventDefault();
-
-        for(let chartKey in groupCharts) {
-            // get chart properties such as canvas id and chart object
-            const chartProp = groupCharts[chartKey];
-
-            // get chart type
-            let chartType = 'bar';
-            const chartSelect = document.getElementById('groupLineType');
-            if (chartSelect.checked) {
-                chartType = 'line';
-            }
-
-            // destroy any previous chart
-            if (chartProp.chartObj) {
-                chartProp.chartObj.destroy();
-                chartProp.chartObj = null;
-            }
-
-            // handle selections
-            chartProp.chartObj = createAggregateChart(
-                chartType,
-                'group',
-                chartKey,
-                chartProp.label,
-                chartProp.canvas,
-                'js-group-select',
-                'js-group-attr-select',
-                chartProp.bgColor
-            );
-        }
-    });
+    return aggregateObj;
 }
 
-// add handlers for form in user sub-tab
-function addUserSelectHandlers() {
-    // add user IDs to user select box
-    const userSelectInput = document.querySelector('#js-user-select');
-    addOptionsToSelect(userSelectInput, Object.keys(userObj));
+function createMultiBarChartCanvas() {
+    const row1 = $('<div class="row"></div>').appendTo('#js-chart-area');
 
-    // add topics and groups option to further select
-    const userSelectAttrInput = document.querySelector('#js-user-attr-select');
-    addOptionsToSelect(userSelectAttrInput, ['groups', 'topics']);
+    const col11 = $('<div class="col-md-6"></div>').appendTo(row1)
+    const messagesChart = $('<canvas></canvas>').appendTo(col11);
+    messagesChart.attr('id', charts.messages.canvas);
 
-    const userSelectForm = document.querySelector('#js-user-form');
-    userSelectForm.addEventListener('submit', (ev) => {
-        ev.preventDefault();
+    const col12 = $('<div class="col-md-6"></div>').appendTo(row1)
+    const likesChart = $('<canvas></canvas>').appendTo(col12);
+    likesChart.attr('id', charts.likes.canvas);
 
-        for(let chartKey in userCharts) {
-            // get chart properties such as canvas id and chart object
-            const chartProp = userCharts[chartKey];
+    const row2 = $('<div class="row"></div>').appendTo('#js-chart-area');
 
-            // get chart type
-            let chartType = 'bar';
-            const chartSelect = document.getElementById('userLineType');
-            if (chartSelect.checked) {
-                chartType = 'line';
-            }
+    const col21 = $('<div class="col-md-6"></div>').appendTo(row2)
+    const textcharsChart = $('<canvas></canvas>').appendTo(col21);
+    textcharsChart.attr('id', charts.textchars.canvas);
 
-            // destroy any previous chart
-            if (chartProp.chartObj) {
-                chartProp.chartObj.destroy();
-                chartProp.chartObj = null;
-            }
+    const col22 = $('<div class="col-md-6"></div>').appendTo(row2)
+    const imagesChart = $('<canvas></canvas>').appendTo(col22);
+    imagesChart.attr('id', charts.images.canvas);
+}
 
-            // handle selections
-            chartProp.chartObj = createAggregateChart(
-                chartType,
-                'user',
-                chartKey,
-                chartProp.label,
-                chartProp.canvas,
-                'js-user-select',
-                'js-user-attr-select',
-                chartProp.bgColor
-            );
-        }
-    });
+function createBarChartCanvas() {
+    const id = 'js-barchart';
+    const barChartCanvas = $('<canvas></canvas>').appendTo('#js-chart-area');
+    barChartCanvas.attr('id', id);
+}
+
+function createHeatMapCanvas() {
+    const id = 'js-heatmap';
+    const heatMapCanvas = $('<canvas></canvas>').appendTo('#js-chart-area');
+    heatMapCanvas.attr('id', id);
 }

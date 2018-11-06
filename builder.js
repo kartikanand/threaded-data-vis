@@ -6,63 +6,70 @@ const chartColors = {
     4: '#a50f15',
 };
 
-function getColor(messages, msgCount) {
-    if (msgCount == 0) {
+function getColor(arr, count) {
+    if (count == 0) {
         return chartColors[0];
     }
 
-    const q25 = Quartile_25(messages);
-    const q50 = Quartile_50(messages);
-    const q75 = Quartile_75(messages);
+    const q25 = Quartile_25(arr);
+    const q50 = Quartile_50(arr);
+    const q75 = Quartile_75(arr);
 
-    if (msgCount <= q25) {
+    if (count <= q25) {
         return chartColors[1];
     }
 
-    if (msgCount <= q50) {
+    if (count <= q50) {
         return chartColors[2];
     }
 
-    if (msgCount <= q75) {
+    if (count <= q75) {
         return chartColors[3];
     }
 
     return chartColors[4];
 }
 
-function createHeatMap() {
-    // no. of users --- labels as no. of data
-    let users = Object.keys(userObj);
+function createHeatMap(
+    canvasId,
+    row,
+    col,
+    attr) {
+    const rowObject = getObjectFromStr(row);
+    const colObject = getObjectFromStr(col);
 
-    // no. of topics --- no. of datasets
-    let topics = Object.keys(topicObj);
+    // no. of xKeys --- labels as no. of data
+    let xKeys = Object.keys(userObj);
 
-    // preprocess to get min/max messages
-    const messages = [];
-    topics.forEach((topic) => {
-        users.forEach((user) => {
+    // no. of yKeys --- no. of datasets
+    let yKeys = Object.keys(colObject);
+
+    // preprocess to get min/max countArr
+    const countArr = [];
+    yKeys.forEach((y) => {
+        xKeys.forEach((x) => {
             // get y object for this x
-            const userObj = topicObj[topic].users;
-            const msgCount = userObj[user].messages;
+            const rObj = colObject[y][row];
+            const count = rObj[x][attr];
 
-            messages.push(msgCount);
+            countArr.push(count);
         });
     });
 
-    const data = Array(users.length).fill(1);
+    const data = Array(xKeys.length).fill(1);
     const datasets = [];
-    topics.forEach((topic) => {
+    yKeys.forEach((y) => {
         const colors = [];
-        users.forEach((user) => {
+        xKeys.forEach((x) => {
             // get y object for this x
-            const userObj = topicObj[topic].users;
-            const msgCount = userObj[user].messages;
+            const rObj = colObject[y][row];
+            const count = rObj[x][attr];
 
-            colors.push(getColor(messages, msgCount));
+            colors.push(getColor(countArr, count));
         });
 
         datasets.push({
-            label: topic,
+            label: y,
             backgroundColor: colors,
             borderColor: 'rgb(130,34,34,0.3)',
             borderWidth: 0.5,
@@ -71,11 +78,11 @@ function createHeatMap() {
     });
 
     var barChartData = {
-        labels: users,
+        labels: xKeys,
         datasets: datasets
     };
 
-    const ctx = document.getElementById('heatmap').getContext('2d');
+    const ctx = document.getElementById(canvasId).getContext('2d');
     var heatmap = new Chart(ctx, {
         type: 'bar',
         data: barChartData,
@@ -105,7 +112,7 @@ function createHeatMap() {
                         beginAtZero:true,
                         stepSize: 1,
                         callback: function(label, index, labels) {
-                            return topics[index];
+                            return yKeys[index];
                         }
                     }
                 }]
@@ -116,10 +123,34 @@ function createHeatMap() {
 
 // general function responsible for creating a bar chart from supplied
 // axis and their values
-function createChart(ctx, chartType, labels, datasets) {
-    // create a new chart
-    const myChart = new Chart(ctx, {
-        type: chartType,
+function createBarChart(
+    canvasId,
+    row,
+    col,
+    id,
+    attr,
+    bgColor) {
+    // get aggregate object using row value
+    const aggregateObj = getObjectFromStr(col);
+
+    // get chart labels as keys
+    const labels = Object.keys(aggregateObj[id][row]);
+
+    // get chart values by iterating over keys
+    const data = labels.map((rowid) => aggregateObj[id][row][rowid][attr]);
+
+    const datasets = [{
+        labels: labels,
+        label: `# of ${attr}`,
+        data: data,
+        backgroundColor: bgColor,
+        borderColor: bgColor
+    }];
+
+    // get canvas declared in document body
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const barChart = new Chart(ctx, {
+        type: 'bar',
         data: {
             labels,
             datasets
@@ -142,50 +173,4 @@ function createChart(ctx, chartType, labels, datasets) {
             }
         }
     });
-
-    return myChart;
-}
-
-function createAggregateChart(
-    chartType,
-    aggregateType,
-    key,
-    label,
-    canvasId,
-    selectId,
-    selectAttrId,
-    bgColor) {
-    let aggregateObj;
-    if (aggregateType == 'topic') {
-        aggregateObj = topicObj;
-    } else if (aggregateType == 'group') {
-        aggregateObj = groupObj;
-    } else if (aggregateType == 'user') {
-        aggregateObj = userObj;
-    }
-
-    const selectInput = document.getElementById(selectId);
-    const selectAttrInput = document.getElementById(selectAttrId);
-
-    const id = selectInput.value;
-    const attr = selectAttrInput.value;
-
-    // get canvas declared in document body
-    const ctx = document.getElementById(canvasId).getContext('2d');
-
-    // get chart labels as keys
-    const labels = Object.keys(aggregateObj[id][attr]);
-
-    // get chart values by iterating over keys
-    const data = labels.map((label) => aggregateObj[id][attr][label][key]);
-
-    const datasets = [{
-        labels: labels,
-        label: label,
-        data: data,
-        backgroundColor: bgColor,
-        borderColor: bgColor
-    }];
-
-    return createChart(ctx, chartType, labels, datasets);
 }
