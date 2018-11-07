@@ -39,7 +39,7 @@ function createHeatMap(
     const colObject = getObjectFromStr(col);
 
     // no. of xKeys --- labels as no. of data
-    let xKeys = Object.keys(userObj);
+    let xKeys = Object.keys(rowObject);
 
     // no. of yKeys --- no. of datasets
     let yKeys = Object.keys(colObject);
@@ -130,14 +130,41 @@ function createBarChart(
     id,
     attr,
     bgColor) {
-    // get aggregate object using row value
-    const aggregateObj = getObjectFromStr(col);
+    let labels = [];
+    let data = [];
+    if (row == col) {
+        // get aggregate object using row value
+        const aggregateObj = getObjectFromStr(row);
+        const rows = Object.keys(aggregateObj);
 
-    // get chart labels as keys
-    const labels = Object.keys(aggregateObj[id][row]);
+        for (let rowid of rows) {
+            let attrCount = 0;
 
-    // get chart values by iterating over keys
-    const data = labels.map((rowid) => aggregateObj[id][row][rowid][attr]);
+            let k = 'groups';
+            if (row == 'groups') {
+                k = 'users';
+            }
+
+            const colObj = aggregateObj[rowid][k];
+            for (let col in colObj) {
+                attrCount += colObj[col][attr];
+            }
+
+            if (id == 'all' || (id == rowid)) {
+                labels.push(rowid);
+                data.push(attrCount);
+            }
+        }
+    } else {
+        // get aggregate object using row value
+        const aggregateObj = getObjectFromStr(col);
+
+        // get chart labels as keys
+        labels = Object.keys(aggregateObj[id][row]);
+
+        // get chart values by iterating over keys
+        data = labels.map((rowid) => aggregateObj[id][row][rowid][attr]);
+    }
 
     const datasets = [{
         labels: labels,

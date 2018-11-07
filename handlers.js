@@ -12,7 +12,7 @@ function masterFormHandler(ev) {
     const id = document.getElementById('js-master-select-id').value;
     const attr = document.getElementById('js-master-select-attr').value;
 
-    if (id == 'all') {
+    if (id == 'all' && row != col) {
         // create single heatmap canvas
         createHeatMapCanvas();
         createHeatMap('js-heatmap', row, col, attr);
@@ -42,6 +42,9 @@ function addFormHandlers() {
 
     const id = document.getElementById('js-master-select-id');
     id.addEventListener('change', selectIdHandler);
+
+    const attr = document.getElementById('js-master-select-attr');
+    attr.addEventListener('change', selectAttrHandler);
 }
 
 function resetFormHandlers() {
@@ -53,6 +56,9 @@ function resetFormHandlers() {
 
     const id = document.getElementById('js-master-select-id');
     id.removeEventListener('change', selectIdHandler);
+
+    const attr = document.getElementById('js-master-select-attr');
+    attr.removeEventListener('change', selectAttrHandler);
 }
 
 function addSelectOptions() {
@@ -82,22 +88,36 @@ function selectColHandler(ev) {
     const colType = ev.target.value;
     const select = document.getElementById('js-master-select-id');
     addSelectIdOptions(colType, select);
+
+    // change attr options by calling id handler
+    selectIdHandler(null);
 }
 
-function selectIdHandler(ev) {
+function selectAttrHandler(ev) {
     ev.preventDefault();
 
     // clear and remove any chart present
     clearChartArea();
+}
 
-    const id = ev.target.value;
+function selectIdHandler(ev) {
+    if (ev) {
+        ev.preventDefault();
+    }
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    const row = document.getElementById('js-master-select-row').value;
+    const col = document.getElementById('js-master-select-col').value;
+    const id = document.getElementById('js-master-select-id').value;
     const select = document.getElementById('js-master-select-attr');
 
     // remove all existing options
     resetSelect(select);
 
     let keys = ['messages', 'images', 'likes', 'textchars'];
-    if (id != 'all') {
+    if (id != 'all' || row == col) {
         keys.push('all');
     }
 
