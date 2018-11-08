@@ -71,6 +71,8 @@ function loadJsonObj(jsonObj) {
     addFormHandlers();
 
     scatterTimePlot(jsonObj);
+
+    masterFormHandler(null);
 }
 
 function resetChartObjs() {

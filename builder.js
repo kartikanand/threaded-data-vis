@@ -116,7 +116,8 @@ function createHeatMap(
                         beginAtZero:true,
                         stepSize: 1,
                         callback: function(label, index, labels) {
-                            return yKeys[index];
+                            const keyLen = yKeys.length;
+                            return yKeys[keyLen - index - 1];
                         }
                     }
                 }]
