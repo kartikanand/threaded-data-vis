@@ -37,6 +37,9 @@ function addFormHandlers() {
     const form = document.getElementById('js-master-form');
     form.addEventListener('submit', masterFormHandler);
 
+    const row = document.getElementById('js-master-select-row');
+    row.addEventListener('change', selectRowHandler);
+
     const col = document.getElementById('js-master-select-col');
     col.addEventListener('change', selectColHandler);
 
@@ -77,6 +80,16 @@ function addSelectOptions() {
     addOptionsToSelect(attr, ['messages', 'images', 'likes', 'textchars']);
 
     addSelectIdOptions('topics', id);
+}
+
+function selectRowHandler(ev) {
+    ev.preventDefault();
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    // change attr options by calling id handler
+    selectIdHandler(null);
 }
 
 function selectColHandler(ev) {

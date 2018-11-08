@@ -69,6 +69,8 @@ function loadJsonObj(jsonObj) {
     addSelectOptions();
 
     addFormHandlers();
+
+    scatterTimePlot(jsonObj);
 }
 
 function resetChartObjs() {

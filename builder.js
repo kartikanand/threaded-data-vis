@@ -1,9 +1,9 @@
 const chartColors = {
-    0: '#fee5d9',
-    1: '#fcae91',
-    2: '#fb6a4a',
-    3: '#de2d26',
-    4: '#a50f15',
+    0: '#eff3ff',
+    1: '#bdd7e7',
+    2: '#6baed6',
+    3: '#3182bd',
+    4: '#08519c',
 };
 
 function getColor(arr, count) {
@@ -71,8 +71,8 @@ function createHeatMap(
         datasets.push({
             label: y,
             backgroundColor: colors,
-            borderColor: 'rgb(130,34,34,0.3)',
-            borderWidth: 0.5,
+            borderColor: '#000',
+            borderWidth: 0.3,
             data: data,
         });
     });
