@@ -2,7 +2,9 @@
 let topicObj = {}, groupObj = {}, userObj = {};
 
 function masterFormHandler(ev) {
-    ev.preventDefault();
+    if (ev) {
+        ev.preventDefault();
+    }
 
     // clear and remove any chart present
     clearChartArea();
@@ -53,6 +55,9 @@ function addFormHandlers() {
 function resetFormHandlers() {
     const form = document.getElementById('js-master-form');
     form.removeEventListener('submit', masterFormHandler);
+
+    const row = document.getElementById('js-master-select-row');
+    row.removeEventListener('change', selectRowHandler);
 
     const col = document.getElementById('js-master-select-col');
     col.removeEventListener('change', selectColHandler);
@@ -111,6 +116,9 @@ function selectAttrHandler(ev) {
 
     // clear and remove any chart present
     clearChartArea();
+
+    // submit the form
+    masterFormHandler(null);
 }
 
 function selectIdHandler(ev) {
@@ -135,6 +143,9 @@ function selectIdHandler(ev) {
     }
 
     addOptionsToSelect(select, keys);
+
+    // submit the form
+    masterFormHandler(null);
 }
 
 function addSelectIdOptions(colType, select) {

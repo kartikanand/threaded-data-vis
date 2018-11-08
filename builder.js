@@ -60,19 +60,21 @@ function createHeatMap(
     const datasets = [];
     yKeys.forEach((y) => {
         const colors = [];
+        const borderColors = [];
         xKeys.forEach((x) => {
             // get y object for this x
             const rObj = colObject[y][row];
             const count = rObj[x][attr];
 
             colors.push(getColor(countArr, count));
+            borderColors.push(getColor(countArr, count));
         });
 
         datasets.push({
             label: y,
             backgroundColor: colors,
-            borderColor: '#000',
-            borderWidth: 0.3,
+            borderColor: borderColors,
+            //borderWidth: 0.3,
             data: data,
         });
     });
@@ -98,7 +100,8 @@ function createHeatMap(
                     barPercentage: 1.0,
                     categoryPercentage: 1.0,
                     gridLines: {
-                        display: false
+                        display: false,
+                        offsetGridLines: false
                     }
                 }],
                 yAxes: [{
@@ -106,7 +109,8 @@ function createHeatMap(
                     barPercentage: 1.0,
                     categoryPercentage: 1.0,
                     gridLines: {
-                        display: false
+                        display: false,
+                        offsetGridLines: false
                     },
                     ticks: {
                         beginAtZero:true,
@@ -130,40 +134,67 @@ function createBarChart(
     id,
     attr,
     bgColor) {
+    const colObj = getObjectFromStr(col);
+    // get aggregate object using row value
+    const cols = Object.keys(colObj);
+
+    // column count to calculate the average
+    const colCount = cols.length;
+
+    const rowObj = getObjectFromStr(row);
+    // get aggregate object using row value
+    const rows = Object.keys(rowObj);
+
+    let avgData = [];
+    for (let rowid of rows) {
+        let attrCount = 0;
+
+        let k = 'groups';
+        if (row == 'groups') {
+            k = 'users';
+        }
+
+        const localColObj = rowObj[rowid][k];
+        for (let col in localColObj) {
+            attrCount += localColObj[col][attr];
+        }
+
+        avgData.push(attrCount/colCount);
+    }
+
     let labels = [];
+    let attrData = [];
+    for (let rowid of rows) {
+        let attrCount = 0;
+
+        let k = 'groups';
+        if (row == 'groups') {
+            k = 'users';
+        }
+
+        const localColObj = rowObj[rowid][k];
+        for (let col in localColObj) {
+            attrCount += localColObj[col][attr];
+        }
+
+        if (id == 'all' || (id == rowid)) {
+            labels.push(rowid);
+            attrData.push(attrCount);
+        }
+    }
+
     let data = [];
     if (row == col) {
-        // get aggregate object using row value
-        const aggregateObj = getObjectFromStr(row);
-        const rows = Object.keys(aggregateObj);
-
-        for (let rowid of rows) {
-            let attrCount = 0;
-
-            let k = 'groups';
-            if (row == 'groups') {
-                k = 'users';
-            }
-
-            const colObj = aggregateObj[rowid][k];
-            for (let col in colObj) {
-                attrCount += colObj[col][attr];
-            }
-
-            if (id == 'all' || (id == rowid)) {
-                labels.push(rowid);
-                data.push(attrCount);
-            }
-        }
+        data = attrData;
     } else {
-        // get aggregate object using row value
-        const aggregateObj = getObjectFromStr(col);
+        labels = [];
 
         // get chart labels as keys
-        labels = Object.keys(aggregateObj[id][row]);
-
         // get chart values by iterating over keys
-        data = labels.map((rowid) => aggregateObj[id][row][rowid][attr]);
+        data = rows.map((rowid) => {
+            labels.push(rowid);
+            return colObj[id][row][rowid][attr]
+        });
     }
 
     const datasets = [{
@@ -173,6 +204,15 @@ function createBarChart(
         backgroundColor: bgColor,
         borderColor: bgColor
     }];
+
+    if (row != col) {
+        datasets.push({
+            labels: labels,
+            label: `Average`,
+            data: avgData,
+            type: 'line'
+        });
+    }
 
     // get canvas declared in document body
     const ctx = document.getElementById(canvasId).getContext('2d');
