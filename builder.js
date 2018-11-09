@@ -92,8 +92,7 @@ function createHeatMap(
         data: barChartData,
         options: {
             tooltips: {
-                mode: 'index',
-                intersect: false
+                display: false
             },
             legend: {
                 display: false
