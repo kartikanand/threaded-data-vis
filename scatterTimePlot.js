@@ -1,8 +1,21 @@
+function isTopPost(messageId, messageJson) {
+    for (let message of messageJson) {
+        if (message.id == messageId) {
+            if (message.parent == null) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}
+
 function scatterTimePlot(messageJson) {
     moment().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
 
     const labels = [];
     const postdata = [];
+    const topReplydata = [];
     const replydata = [];
     for (let message of messageJson) {
         const time = message.time;
@@ -11,10 +24,17 @@ function scatterTimePlot(messageJson) {
         const hour = parseInt(moment(time).format('hh'));
         const minutes = 60*hour + parseInt(moment(time).format('mm'));
         const isReply = message.parent != null;
+        const isTopReply = isReply && isTopPost(message.parent, messageJson);
 
         labels.push(date);
 
-        if (isReply) {
+        if (isTopReply) {
+            topReplydata.push({
+                x: date,
+                y: minutes
+            });
+        }
+        else if (isReply) {
             replydata.push({
                 x: date,
                 y: minutes
@@ -35,13 +55,18 @@ function scatterTimePlot(messageJson) {
             datasets: [{
                 label: 'Initial Post',
                 data: postdata,
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 0.5)'
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 0.7)'
+            },{
+                label: 'Top Level Replies',
+                data: topReplydata,
+                backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                borderColor: 'rgba(255, 206, 86, 0.7)'
             },{
                 label: 'Replies',
                 data: replydata,
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgba(255, 99, 132, 0.5)'
+                backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                borderColor: 'rgba(255, 99, 132, 0.7)'
             }]
         },
         options: {
@@ -50,6 +75,7 @@ function scatterTimePlot(messageJson) {
                     type: 'time',
                     distribution: 'series',
                     ticks: {
+                        beginAtZero:true,
                         source: 'labels'
                     }
                 }],

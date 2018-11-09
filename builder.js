@@ -56,6 +56,8 @@ function createHeatMap(
         });
     });
 
+    addHeatMapLegends(countArr);
+
     const data = Array(xKeys.length).fill(1);
     const datasets = [];
     yKeys.forEach((y) => {
@@ -79,19 +81,22 @@ function createHeatMap(
         });
     });
 
-    var barChartData = {
+    const barChartData = {
         labels: xKeys,
         datasets: datasets
     };
 
     const ctx = document.getElementById(canvasId).getContext('2d');
-    var heatmap = new Chart(ctx, {
+    const heatmap = new Chart(ctx, {
         type: 'bar',
         data: barChartData,
         options: {
             tooltips: {
                 mode: 'index',
                 intersect: false
+            },
+            legend: {
+                display: false
             },
             responsive: true,
             scales: {
@@ -134,19 +139,21 @@ function createBarChart(
     col,
     id,
     attr,
-    bgColor) {
-    const colObj = getObjectFromStr(col);
+    bgColor,
+    chartType,
+    showNulls) {
     // get aggregate object using row value
+    const colObj = getObjectFromStr(col);
     const cols = Object.keys(colObj);
 
     // column count to calculate the average
     const colCount = cols.length;
 
-    const rowObj = getObjectFromStr(row);
     // get aggregate object using row value
+    const rowObj = getObjectFromStr(row);
     const rows = Object.keys(rowObj);
 
-    let avgData = [];
+    let avgObj = {};
     for (let rowid of rows) {
         let attrCount = 0;
 
@@ -160,42 +167,43 @@ function createBarChart(
             attrCount += localColObj[col][attr];
         }
 
-        avgData.push(attrCount/colCount);
+        avgObj[rowid] = attrCount/colCount;
     }
 
     let labels = [];
-    let attrData = [];
-    for (let rowid of rows) {
-        let attrCount = 0;
-
-        let k = 'groups';
-        if (row == 'groups') {
-            k = 'users';
-        }
-
-        const localColObj = rowObj[rowid][k];
-        for (let col in localColObj) {
-            attrCount += localColObj[col][attr];
-        }
-
-        if (id == 'all' || (id == rowid)) {
-            labels.push(rowid);
-            attrData.push(attrCount);
-        }
-    }
-
     let data = [];
+    let avgData = [];
     if (row == col) {
-        data = attrData;
-    } else {
-        labels = [];
+        for (let rowid of rows) {
+            let attrCount = 0;
 
-        // get chart labels as keys
-        // get chart values by iterating over keys
-        data = rows.map((rowid) => {
-            labels.push(rowid);
-            return colObj[id][row][rowid][attr]
-        });
+            let k = 'groups';
+            if (row == 'groups') {
+                k = 'users';
+            }
+
+            const localColObj = rowObj[rowid][k];
+            for (let col in localColObj) {
+                attrCount += localColObj[col][attr];
+            }
+
+            if (id == 'all' || (id == rowid)) {
+                if (attrCount != 0 || showNulls) {
+                    labels.push(rowid);
+                    data.push(attrCount);
+                    avgData.push(avgObj[rowid]);
+                }
+            }
+        }
+    } else {
+        for (let rowid of rows) {
+            let attrCount = colObj[id][row][rowid][attr];
+            if (attrCount != 0 || showNulls) {
+                labels.push(rowid);
+                data.push(attrCount);
+                avgData.push(avgObj[rowid]);
+            }
+        }
     }
 
     const datasets = [{
@@ -207,21 +215,26 @@ function createBarChart(
     }];
 
     if (row != col) {
-        datasets.push({
+        datasets.unshift({
             labels: labels,
             label: `Average`,
             data: avgData,
-            type: 'line'
+            type: 'line',
+            backgroundColor: 'rgba(194, 196, 209, 0.23)',
+            bgColor: 'rgba(194, 196, 209, 0.23)'
         });
     }
 
     // get canvas declared in document body
     const ctx = document.getElementById(canvasId).getContext('2d');
     const barChart = new Chart(ctx, {
-        type: 'bar',
+        type: chartType,
         data: {
             labels,
             datasets
+        },
+        filter: (x) => {
+            x.yLabel > 0
         },
         options: {
             scales: {

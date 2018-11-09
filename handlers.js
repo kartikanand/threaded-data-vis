@@ -19,19 +19,33 @@ function masterFormHandler(ev) {
         createHeatMapCanvas();
         createHeatMap('js-heatmap', row, col, attr);
         return;
-    }
+    } else {
+        // get chart type
+        let chartType = 'bar';
+        const chartTypeLine = document.getElementById('chartTypeLine');
+        if (chartTypeLine.checked) {
+            chartType = 'line';
+        }
 
-    if (attr != 'all') {
-        // create single barchart canvas
-        createBarChartCanvas();
-        createBarChart('js-barchart', row, col, id, attr, charts[attr].bgColor);
-        return;
-    }
+        // null behavior
+        let showNull = true;
+        const hideNull = document.getElementById('hideNull');
+        if (hideNull.checked) {
+            showNull = false;
+        }
 
-    // create multi-barchart canvas
-    createMultiBarChartCanvas();
-    for (let attr in charts) {
-        createBarChart(charts[attr].canvas, row, col, id, attr, charts[attr].bgColor);
+        if (attr != 'all') {
+            // create single barchart canvas
+            createBarChartCanvas();
+            createBarChart('js-barchart', row, col, id, attr, charts[attr].bgColor, chartType, showNull);
+            return;
+        }
+
+        // create multi-barchart canvas
+        createMultiBarChartCanvas();
+        for (let attr in charts) {
+            createBarChart(charts[attr].canvas, row, col, id, attr, charts[attr].bgColor, chartType, showNull);
+        }
     }
 }
 
@@ -50,6 +64,18 @@ function addFormHandlers() {
 
     const attr = document.getElementById('js-master-select-attr');
     attr.addEventListener('change', selectAttrHandler);
+
+    const chartTypeLine = document.getElementById('chartTypeLine');
+    chartTypeLine.addEventListener('change', chartTypeHandler);
+
+    const chartTypeBar = document.getElementById('chartTypeBar');
+    chartTypeBar.addEventListener('change', chartTypeHandler);
+
+    const showNull = document.getElementById('showNull');
+    showNull.addEventListener('change', nullHandler);
+
+    const hideNull = document.getElementById('hideNull');
+    hideNull.addEventListener('change', nullHandler);
 }
 
 function resetFormHandlers() {
@@ -67,6 +93,18 @@ function resetFormHandlers() {
 
     const attr = document.getElementById('js-master-select-attr');
     attr.removeEventListener('change', selectAttrHandler);
+
+    const chartTypeLine = document.getElementById('chartTypeLine');
+    chartTypeLine.removeEventListener('change', chartTypeHandler);
+
+    const chartTypeBar = document.getElementById('chartTypeBar');
+    chartTypeBar.removeEventListener('change', chartTypeHandler);
+
+    const showNull = document.getElementById('showNull');
+    showNull.removeEventListener('change', nullHandler);
+
+    const hideNull = document.getElementById('hideNull');
+    hideNull.removeEventListener('change', nullHandler);
 }
 
 function addSelectOptions() {
@@ -85,6 +123,26 @@ function addSelectOptions() {
     addOptionsToSelect(attr, ['messages', 'images', 'likes', 'textchars']);
 
     addSelectIdOptions('topics', id);
+}
+
+function nullHandler(ev) {
+    ev.preventDefault()
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    // submit the form
+    masterFormHandler(null);
+}
+
+function chartTypeHandler(ev) {
+    ev.preventDefault();
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    // submit the form
+    masterFormHandler(null);
 }
 
 function selectRowHandler(ev) {
@@ -210,6 +268,26 @@ function createMultiBarChartCanvas() {
     const col22 = $('<div class="col-md-6"></div>').appendTo(row2)
     const imagesChart = $('<canvas></canvas>').appendTo(col22);
     imagesChart.attr('id', charts.images.canvas);
+}
+
+function addHeatMapLegends(arr) {
+    const q25 = Quartile_25(arr);
+    const q50 = Quartile_50(arr);
+    const q75 = Quartile_75(arr);
+    const max = Math.max(...arr);
+
+    const legendRow = $('<div class"row"></div>');
+    const legendCol = $('<div class="col-12 text-center"></div>');
+
+    legendCol.appendTo(legendRow);
+
+    $('<button class="btn btn-primary btn-sm">0</button>').css("color", "black").css("background-color", "#eff3ff").appendTo(legendCol);
+    $(`<button class="btn btn-primary btn-sm">${q25}</button>`).css("color", "black").css("background-color", "#bdd7e7").appendTo(legendCol);
+    $(`<button class="btn btn-primary btn-sm">${q50}</button>`).css("background-color", "#6baed6").appendTo(legendCol);
+    $(`<button class="btn btn-primary btn-sm">${q75}</button>`).css("background-color", "#3182bd").appendTo(legendCol);
+    $(`<button class="btn btn-primary btn-sm">${max}</button>`).css("background-color", "#08519c").appendTo(legendCol);
+
+    legendRow.appendTo('#js-chart-area')
 }
 
 function createBarChartCanvas() {
