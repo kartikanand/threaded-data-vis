@@ -34,17 +34,29 @@ function masterFormHandler(ev) {
             showNull = false;
         }
 
+        let sortLabel = true;
+        const sortValue = document.getElementById('sortValue');
+        if (sortValue.checked) {
+            sortLabel = false;
+        }
+
+        let sortAsc = true;
+        const sortDsc = document.getElementById('sortDsc');
+        if (sortDsc.checked) {
+            sortAsc = false;
+        }
+
         if (attr != 'all') {
             // create single barchart canvas
             createBarChartCanvas();
-            createBarChart('js-barchart', row, col, id, attr, charts[attr].bgColor, chartType, showNull);
+            createBarChart('js-barchart', row, col, id, attr, charts[attr].bgColor, chartType, showNull, sortLabel, sortAsc);
             return;
         }
 
         // create multi-barchart canvas
         createMultiBarChartCanvas();
         for (let attr in charts) {
-            createBarChart(charts[attr].canvas, row, col, id, attr, charts[attr].bgColor, chartType, showNull);
+            createBarChart(charts[attr].canvas, row, col, id, attr, charts[attr].bgColor, chartType, showNull, sortLabel, sortAsc);
         }
     }
 }
@@ -76,6 +88,18 @@ function addFormHandlers() {
 
     const hideNull = document.getElementById('hideNull');
     hideNull.addEventListener('change', nullHandler);
+
+    const sortLabel = document.getElementById('sortLabel');
+    sortLabel.addEventListener('change', sortHandler);
+
+    const sortValue = document.getElementById('sortValue');
+    sortValue.addEventListener('change', sortHandler);
+
+    const sortAsc = document.getElementById('sortAsc');
+    sortAsc.addEventListener('change', sortTypeHandler);
+
+    const sortDsc = document.getElementById('sortDsc');
+    sortDsc.addEventListener('change', sortTypeHandler);
 }
 
 function resetFormHandlers() {
@@ -105,6 +129,18 @@ function resetFormHandlers() {
 
     const hideNull = document.getElementById('hideNull');
     hideNull.removeEventListener('change', nullHandler);
+
+    const sortLabel = document.getElementById('sortLabel');
+    sortLabel.removeEventListener('change', sortHandler);
+
+    const sortValue = document.getElementById('sortValue');
+    sortValue.removeEventListener('change', sortHandler);
+
+    const sortAsc = document.getElementById('sortAsc');
+    sortAsc.removeEventListener('change', sortTypeHandler);
+
+    const sortDsc = document.getElementById('sortDsc');
+    sortDsc.removeEventListener('change', sortTypeHandler);
 }
 
 function addSelectOptions() {
@@ -126,6 +162,26 @@ function addSelectOptions() {
 }
 
 function nullHandler(ev) {
+    ev.preventDefault()
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    // submit the form
+    masterFormHandler(null);
+}
+
+function sortTypeHandler(ev) {
+    ev.preventDefault()
+
+    // clear and remove any chart present
+    clearChartArea();
+
+    // submit the form
+    masterFormHandler(null);
+}
+
+function sortHandler(ev) {
     ev.preventDefault()
 
     // clear and remove any chart present

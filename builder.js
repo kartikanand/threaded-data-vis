@@ -140,7 +140,10 @@ function createBarChart(
     attr,
     bgColor,
     chartType,
-    showNulls) {
+    showNulls,
+    sortLabel,
+    sortAsc) {
+
     // get aggregate object using row value
     const colObj = getObjectFromStr(col);
     const cols = Object.keys(colObj);
@@ -169,9 +172,9 @@ function createBarChart(
         avgObj[rowid] = attrCount/colCount;
     }
 
-    let labels = [];
-    let data = [];
-    let avgData = [];
+    // construct bar chart object for sorting
+    const barChartObj = [];
+
     if (row == col) {
         for (let rowid of rows) {
             let attrCount = 0;
@@ -188,9 +191,10 @@ function createBarChart(
 
             if (id == 'all' || (id == rowid)) {
                 if (attrCount != 0 || showNulls) {
-                    labels.push(rowid);
-                    data.push(attrCount);
-                    avgData.push(avgObj[rowid]);
+                    barChartObj.push({
+                        label: rowid,
+                        count: attrCount
+                    });
                 }
             }
         }
@@ -198,11 +202,41 @@ function createBarChart(
         for (let rowid of rows) {
             let attrCount = colObj[id][row][rowid][attr];
             if (attrCount != 0 || showNulls) {
-                labels.push(rowid);
-                data.push(attrCount);
-                avgData.push(avgObj[rowid]);
+                barChartObj.push({
+                    label: rowid,
+                    count: attrCount
+                });
             }
         }
+    }
+
+    if (sortLabel) {
+        barChartObj.sort(function labelCompare(a, b) {
+            if (a.label < b.label)
+                return sortAsc ? -1 : 1;
+            if (a.label > b.label)
+                return sortAsc ? 1 : -1;
+
+            return 0;
+        });
+    } else {
+        barChartObj.sort(function countCompare(a, b) {
+            if (a.count < b.count)
+                return sortAsc ? -1 : 1;
+            if (a.count > b.count)
+                return sortAsc ? 1 : -1;
+
+            return 0;
+        });
+    }
+
+    let labels = [];
+    let data = [];
+    let avgData = [];
+    for (let obj of barChartObj) {
+        labels.push(obj.label);
+        data.push(obj.count);
+        avgData.push(avgObj[obj.label]);
     }
 
     const datasets = [{
