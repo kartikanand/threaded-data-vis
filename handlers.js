@@ -1,5 +1,6 @@
 // global objects
 let topicObj = {}, groupObj = {}, userObj = {};
+let messageJson = [];
 
 function masterFormHandler(ev) {
     if (ev) {
@@ -13,6 +14,9 @@ function masterFormHandler(ev) {
     const col = document.getElementById('js-master-select-col').value;
     const id = document.getElementById('js-master-select-id').value;
     const attr = document.getElementById('js-master-select-attr').value;
+
+    createScatterPlotCanvas();
+    scatterTimePlot(col, id);
 
     if (id == 'all' && row != col) {
         // create single heatmap canvas
@@ -289,6 +293,7 @@ function addOptionsToSelect(select, options) {
 
 function clearChartArea() {
     $('#js-chart-area').empty();
+    $('#js-timescatter-area').empty();
 }
 
 function getObjectFromStr(str) {
@@ -368,4 +373,10 @@ function createHeatMapCanvas() {
     const id = 'js-heatmap';
     const heatMapCanvas = $('<canvas></canvas>').appendTo('#js-chart-area');
     heatMapCanvas.attr('id', id);
+}
+
+function createScatterPlotCanvas() {
+    const id = 'js-timescatter';
+    const scatterTimeCanvas = $('<canvas></canvas>').appendTo('#js-timescatter-area');
+    scatterTimeCanvas.attr('id', id);
 }

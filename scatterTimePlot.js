@@ -10,7 +10,7 @@ function isTopPost(messageId, messageJson) {
     }
 }
 
-function scatterTimePlot(messageJson) {
+function scatterTimePlot(col, id) {
     moment().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
 
     const labels = [];
@@ -25,6 +25,17 @@ function scatterTimePlot(messageJson) {
         const minutes = 60*hour + parseInt(moment(time).format('mm'));
         const isReply = message.parent != null;
         const isTopReply = isReply && isTopPost(message.parent, messageJson);
+
+        if (id != 'all') {
+            if (col == 'users' && message.user != id)
+                continue;
+
+            if (col == 'groups' && message.groupID != id)
+                continue;
+
+            if (col == 'topics' && message.topicID != id)
+                continue;
+        }
 
         labels.push(date);
 
@@ -47,7 +58,7 @@ function scatterTimePlot(messageJson) {
         }
     }
 
-    var ctx = document.getElementById('chart1').getContext('2d');
+    var ctx = document.getElementById('js-timescatter').getContext('2d');
     var cfg = {
         type: 'scatter',
         data: {

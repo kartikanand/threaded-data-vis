@@ -64,13 +64,15 @@ function loadJsonObj(jsonObj) {
     // clear and remove any chart present
     clearChartArea();
 
+    messageJson = jsonObj;
+
     getAggregateStatistics(jsonObj);
 
     addSelectOptions();
 
     addFormHandlers();
 
-    scatterTimePlot(jsonObj);
+    $('.js-details').show();
 
     masterFormHandler(null);
 }
@@ -79,6 +81,7 @@ function resetChartObjs() {
     topicObj = {};
     groupObj = {};
     userObj = {};
+    messageObj = [];
 }
 
 function resetSelect(select) {
