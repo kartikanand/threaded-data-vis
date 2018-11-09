@@ -282,10 +282,22 @@ function addHeatMapLegends(arr) {
     legendCol.appendTo(legendRow);
 
     $('<button class="btn btn-primary btn-sm">0</button>').css("color", "black").css("background-color", "#eff3ff").appendTo(legendCol);
-    $(`<button class="btn btn-primary btn-sm">${q25}</button>`).css("color", "black").css("background-color", "#bdd7e7").appendTo(legendCol);
-    $(`<button class="btn btn-primary btn-sm">${q50}</button>`).css("background-color", "#6baed6").appendTo(legendCol);
-    $(`<button class="btn btn-primary btn-sm">${q75}</button>`).css("background-color", "#3182bd").appendTo(legendCol);
-    $(`<button class="btn btn-primary btn-sm">${max}</button>`).css("background-color", "#08519c").appendTo(legendCol);
+
+    if (q25 > 0) {
+        $(`<button class="btn btn-primary btn-sm">${q25}</button>`).css("color", "black").css("background-color", "#bdd7e7").appendTo(legendCol);
+    }
+
+    if (q50 > q25) {
+        $(`<button class="btn btn-primary btn-sm">${q50}</button>`).css("background-color", "#6baed6").appendTo(legendCol);
+    }
+
+    if (q75 > q50) {
+        $(`<button class="btn btn-primary btn-sm">${q75}</button>`).css("background-color", "#3182bd").appendTo(legendCol);
+    }
+
+    if (max > q75) {
+        $(`<button class="btn btn-primary btn-sm">${max}</button>`).css("background-color", "#08519c").appendTo(legendCol);
+    }
 
     legendRow.appendTo('#js-chart-area')
 }

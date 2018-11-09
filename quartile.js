@@ -1,18 +1,18 @@
 //adapted from https://blog.poettner.de/2011/06/09/simple-statistics-with-php/
 function Median(data) {
-  return Quartile_50(data);
+  return Math.floor(Quartile_50(data));
 }
 
 function Quartile_25(data) {
-  return Quartile(data, 0.25);
+  return Math.floor(Quartile(data, 0.25));
 }
 
 function Quartile_50(data) {
-  return Quartile(data, 0.5);
+  return Math.floor(Quartile(data, 0.5));
 }
 
 function Quartile_75(data) {
-  return Quartile(data, 0.75);
+  return Math.floor(Quartile(data, 0.75));
 }
 
 function Quartile(data, q) {
