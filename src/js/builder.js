@@ -91,6 +91,10 @@ function createHeatMap(
         type: 'bar',
         data: barChartData,
         options: {
+            title: {
+                display: true,
+                text: `# of ${attr}`
+            },
             tooltips: {
                 display: false
             },
@@ -100,6 +104,10 @@ function createHeatMap(
             responsive: true,
             scales: {
                 xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: row
+                    },
                     stacked: true,
                     barPercentage: 1.0,
                     categoryPercentage: 1.0,
@@ -112,6 +120,10 @@ function createHeatMap(
                     stacked: true,
                     barPercentage: 1.0,
                     categoryPercentage: 1.0,
+                    scaleLabel: {
+                        display: true,
+                        labelString: col
+                    },
                     gridLines: {
                         display: false,
                         offsetGridLines: false

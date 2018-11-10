@@ -81,6 +81,10 @@ function scatterTimePlot(col, id) {
             }]
         },
         options: {
+            title: {
+                display: true,
+                text: `${col}: ${id}`
+            },
             scales: {
                 xAxes: [{
                     type: 'time',
@@ -98,6 +102,18 @@ function scatterTimePlot(col, id) {
                     ticks: {
                         beginAtZero:true,
                         stepSize: 60,
+                        callback: function(label, index, labels) {
+                            const hour = parseInt(label)/60;
+                            let sHour = String(hour);
+
+                            if (sHour.length == 1) {
+                                sHour = '0' + sHour;
+                            }
+
+                            sHour += '00';
+
+                            return sHour;
+                        }
                     }
                 }]
             }

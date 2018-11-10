@@ -338,7 +338,7 @@ function addHeatMapLegends(arr) {
     const max = Math.max(...arr);
 
     const legendRow = $('<div class"row"></div>');
-    const legendCol = $('<div class="col-12 text-center"></div>');
+    const legendCol = $('<div class="col-12"></div>');
 
     legendCol.appendTo(legendRow);
 
