@@ -21,8 +21,8 @@ function scatterTimePlot(col, id) {
         const time = message.time;
 
         const date = moment(time).format('MMMM DD')
-        const hour = parseInt(moment(time).format('hh'));
-        const minutes = 60*hour + parseInt(moment(time).format('mm'));
+        const hour = parseInt(moment(time).format('HH'));
+        const minutes = 60*hour + parseInt(moment(time).format('MM'));
         const isReply = message.parent != null;
         const isTopReply = isReply && isTopPost(message.parent, messageJson);
 
