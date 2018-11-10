@@ -11,7 +11,7 @@ function addGlobalEventHandlers() {
     sampleDataInput1.addEventListener('click', (ev) => {
         ev.preventDefault();
 
-        fetch('../../data/example1.json').then((response) => {
+        fetch('./data/example1.json').then((response) => {
             return response.json();
         }).then(loadJsonObj);
     });
@@ -20,7 +20,7 @@ function addGlobalEventHandlers() {
     sampleDataInput2.addEventListener('click', (ev) => {
         ev.preventDefault();
 
-        fetch('../../data/example2.json').then((response) => {
+        fetch('./data/example2.json').then((response) => {
             return response.json();
         }).then(loadJsonObj);
     });
