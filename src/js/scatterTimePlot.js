@@ -92,6 +92,9 @@ function scatterTimePlot(col, id) {
                     ticks: {
                         beginAtZero:true,
                         source: 'labels'
+                    },
+                    time: {
+                        unit: 'day'
                     }
                 }],
                 yAxes: [{
